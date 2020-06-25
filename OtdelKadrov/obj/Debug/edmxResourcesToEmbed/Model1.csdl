@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="OtdelKadrovModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Dolzhnost">
+    <Key>
+      <PropertyRef Name="Id_Dolzhnost" />
+    </Key>
+    <Property Name="Id_Dolzhnost" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name_Dolzh" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Oklad" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Sotrudniks" Relationship="Self.FK_Sotrudnik_Dolzhnost" FromRole="Dolzhnost" ToRole="Sotrudnik" />
+  </EntityType>
+  <EntityType Name="Otdel">
+    <Key>
+      <PropertyRef Name="Id_Otdel" />
+    </Key>
+    <Property Name="Id_Otdel" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name_Otdel" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Cab_Number" Type="Int32" Nullable="false" />
+    <Property Name="Phone" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="FIO_Chief" Type="String" MaxLength="70" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="Sotrudniks" Relationship="Self.FK_Sotrudnik_Otdel" FromRole="Otdel" ToRole="Sotrudnik" />
+  </EntityType>
+  <EntityType Name="Sotrudnik">
+    <Key>
+      <PropertyRef Name="Id_Sotrudnik" />
+    </Key>
+    <Property Name="Id_Sotrudnik" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Table_Number" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="FIO" Type="String" MaxLength="70" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Id_Otdel" Type="Int32" Nullable="false" />
+    <Property Name="Id_Dolzhnost" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Dolzhnost" Relationship="Self.FK_Sotrudnik_Dolzhnost" FromRole="Sotrudnik" ToRole="Dolzhnost" />
+    <NavigationProperty Name="Otdel" Relationship="Self.FK_Sotrudnik_Otdel" FromRole="Sotrudnik" ToRole="Otdel" />
+  </EntityType>
+  <EntityType Name="sysdiagram">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <Association Name="FK_Sotrudnik_Dolzhnost">
+    <End Role="Dolzhnost" Type="Self.Dolzhnost" Multiplicity="1" />
+    <End Role="Sotrudnik" Type="Self.Sotrudnik" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Dolzhnost">
+        <PropertyRef Name="Id_Dolzhnost" />
+      </Principal>
+      <Dependent Role="Sotrudnik">
+        <PropertyRef Name="Id_Dolzhnost" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Sotrudnik_Otdel">
+    <End Role="Otdel" Type="Self.Otdel" Multiplicity="1" />
+    <End Role="Sotrudnik" Type="Self.Sotrudnik" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Otdel">
+        <PropertyRef Name="Id_Otdel" />
+      </Principal>
+      <Dependent Role="Sotrudnik">
+        <PropertyRef Name="Id_Otdel" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="Context" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Dolzhnosts" EntityType="Self.Dolzhnost" />
+    <EntitySet Name="Otdels" EntityType="Self.Otdel" />
+    <EntitySet Name="Sotrudniks" EntityType="Self.Sotrudnik" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+    <AssociationSet Name="FK_Sotrudnik_Dolzhnost" Association="Self.FK_Sotrudnik_Dolzhnost">
+      <End Role="Dolzhnost" EntitySet="Dolzhnosts" />
+      <End Role="Sotrudnik" EntitySet="Sotrudniks" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Sotrudnik_Otdel" Association="Self.FK_Sotrudnik_Otdel">
+      <End Role="Otdel" EntitySet="Otdels" />
+      <End Role="Sotrudnik" EntitySet="Sotrudniks" />
+    </AssociationSet>
+    <FunctionImport Name="sp_alterdiagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="version" Mode="In" Type="Int32" />
+      <Parameter Name="definition" Mode="In" Type="Binary" />
+    </FunctionImport>
+    <FunctionImport Name="sp_creatediagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="version" Mode="In" Type="Int32" />
+      <Parameter Name="definition" Mode="In" Type="Binary" />
+    </FunctionImport>
+    <FunctionImport Name="sp_dropdiagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_helpdiagramdefinition" ReturnType="Collection(OtdelKadrovModel.sp_helpdiagramdefinition_Result)">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_helpdiagrams" ReturnType="Collection(OtdelKadrovModel.sp_helpdiagrams_Result)">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_renamediagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="new_diagramname" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="sp_upgraddiagrams" />
+  </EntityContainer>
+  <ComplexType Name="sp_helpdiagramdefinition_Result">
+    <Property Type="Int32" Name="version" Nullable="true" />
+    <Property Type="Binary" Name="definition" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="sp_helpdiagrams_Result">
+    <Property Type="String" Name="Database" Nullable="true" MaxLength="128" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="128" />
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Owner" Nullable="true" MaxLength="128" />
+    <Property Type="Int32" Name="OwnerID" Nullable="false" />
+  </ComplexType>
+</Schema>
